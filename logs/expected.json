@@ -1,0 +1,7 @@
+{
+  "windows_rdp_brute_force": 1,
+  "linux_ssh_brute_force": 1,
+  "password_spraying": 1,
+  "credential_dumping_mimikatz": 2,
+  "impossible_travel_logon": 1
+}

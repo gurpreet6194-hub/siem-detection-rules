@@ -1,0 +1,42 @@
+title: Impossible Travel - Successful Logons From Distant Locations
+id: 7c8d9e0f-1a2b-3c4d-5e6f-7a8b9c0d1e2f
+status: experimental
+description: |
+  Detects successful logons (Event ID 4624) for the same account from two
+  geographically distant locations within a time window too short for physical
+  travel. Strong indicator of session hijacking, credential theft, or token
+  replay (ATT&CK T1078 - Valid Accounts).
+
+  NOTE: stock Sigma correlation types do not express geo-velocity. This rule
+  uses a temporal correlation skeleton plus the lab-only extension
+  `x-lab-emulation: geo_velocity`, which the included validate_rules.py
+  emulates by comparing the Country field of grouped 4624 events. In
+  production, implement this as a SIEM analytics/correlations rule on top of
+  IP-geolocation enrichment.
+author: Gurpreet Singh
+date: 2026/09/28
+references:
+  - https://attack.mitre.org/techniques/T1078/
+logsource:
+  product: windows
+  category: authentication
+detection:
+  successful_logon:
+    EventID: 4624
+correlation:
+  type: temporal
+  rules:
+    - successful_logon
+  group-by:
+    - TargetUserName
+  timespan: 60m
+  condition:
+    gte: 2
+  x-lab-emulation: geo_velocity   # lab-only: validator compares Country per group
+falsepositives:
+  - Users on VPN egressing from another country, corporate proxy / egress NAT
+level: high
+tags:
+  - attack.t1078       # Valid Accounts
+  - attack.persistence
+  - attack.defense_evasion
